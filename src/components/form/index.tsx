@@ -92,7 +92,6 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({
     setTimeout(() => {
       setIsSubmitted(false);
     }, 3000);
-    console.log(values);
   };
 
   const handleEdit = async (values: FormValues) => {
@@ -106,7 +105,6 @@ const JobApplicationForm: React.FC<JobApplicationFormProps> = ({
       }
       setIsSubmitted(false);
     }, 3000);
-    console.log(values);
   };
 
   return (
