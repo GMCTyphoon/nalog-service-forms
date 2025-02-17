@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import VacancyItem from './VacancyItem';
 import styles from './VacancyList.module.css';
 import useHttp from '../../hooks/useHttp';
@@ -48,13 +54,16 @@ const VacancyList: React.FC = () => {
     }
   }, [data]);
 
-  const handleStartEdit = (id: string) => {
-    setIsEditing(true);
-    selectedId.current = id;
-    setSelectedVacancy(
-      [...vacancies].filter((a) => a.id === selectedId.current)[0]
-    );
-  };
+  const handleStartEdit = useCallback(
+    (id: string) => {
+      setIsEditing(true);
+      selectedId.current = id;
+      setSelectedVacancy(
+        [...vacancies].filter((a) => a.id === selectedId.current)[0]
+      );
+    },
+    [vacancies]
+  );
 
   const onSubmitEdit = useCallback((values: FormValues) => {
     if (values) {
@@ -70,6 +79,29 @@ const VacancyList: React.FC = () => {
     setIsEditing(false);
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
+
+  const vacancyList = useMemo(() => {
+    return (
+      <div className={styles.vacancyList}>
+        {vacancies.map((vacancy) => (
+          <VacancyItem
+            key={vacancy.id}
+            id={vacancy.id}
+            publicationDate={vacancy.openingDate}
+            title={vacancy.vacancyName}
+            location={vacancy.address}
+            salaryFrom={vacancy.salaryFrom}
+            experience={vacancy.experience}
+            metroStations={vacancy.metroStation}
+            salaryType={vacancy.salaryType}
+            region={vacancy.region}
+            salaryTo={vacancy.salaryTo}
+            handleStartEdit={handleStartEdit}
+          />
+        ))}
+      </div>
+    );
+  }, [vacancies, handleStartEdit]);
 
   if (isLoading) {
     return (
@@ -104,26 +136,7 @@ const VacancyList: React.FC = () => {
           Заявки на размещение вакансий
         </h1>
       )}
-      {!isEditing && (
-        <div className={styles.vacancyList}>
-          {vacancies.map((vacancy) => (
-            <VacancyItem
-              key={vacancy.id}
-              id={vacancy.id}
-              publicationDate={vacancy.openingDate}
-              title={vacancy.vacancyName}
-              location={vacancy.address}
-              salaryFrom={vacancy.salaryFrom}
-              experience={vacancy.experience}
-              metroStations={vacancy.metroStation}
-              salaryType={vacancy.salaryType}
-              region={vacancy.region}
-              salaryTo={vacancy.salaryTo}
-              handleStartEdit={handleStartEdit}
-            />
-          ))}
-        </div>
-      )}
+      {!isEditing && vacancyList}
     </>
   );
 };
